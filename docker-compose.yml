@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  auto-build-tool:
+    image: local/base-build-tools:1.0
+    container_name: auto-build-tool
+    restart: unless-stopped
+    ports:
+      - "30003:5000"
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - /volume3/docker/auto-build-tool/app:/app/data
+      - /volume3/docker/auto-build-tool/repo:/app/repo
+      - /volume3/docker/auto-build-tool/mvn-repo:/root/.m2/repository
+      - /volume3/docker/auto-build-tool/npm-repo:/root/.npm
+    working_dir: /app
+    command: ["python", "/app/data/app.py"]
