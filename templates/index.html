@@ -81,8 +81,8 @@
             <input type="text" name="local_base_path" required placeholder="D:/repos" />
           </label>
           <label>
-            构建脚本（PowerShell）
-            <textarea name="build_script" rows="4" required placeholder="mvn clean package -DskipTests&#10;# 或 npm ci; npm run build"></textarea>
+            构建脚本（Windows 用 PowerShell，Linux 用 bash/sh）
+            <textarea name="build_script" rows="4" required placeholder="mvn clean package -DskipTests&#10;# 或 npm ci && npm run build"></textarea>
           </label>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">创建并克隆</button>

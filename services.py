@@ -1,3 +1,5 @@
+import locale
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -5,16 +7,29 @@ from typing import Iterable
 from urllib.parse import quote, urlsplit, urlunsplit
 
 
+def _decode_output(raw: bytes | None) -> str:
+    if not raw:
+        return ""
+
+    preferred = locale.getpreferredencoding(False) or "utf-8"
+    candidates = [preferred, "utf-8", "gb18030", "gbk"]
+    for enc in candidates:
+        try:
+            return raw.decode(enc)
+        except UnicodeDecodeError:
+            continue
+
+    return raw.decode("utf-8", errors="replace")
+
+
 def run_command(args: Iterable[str], cwd: str | None = None) -> tuple[int, str]:
     process = subprocess.run(
         list(args),
         cwd=cwd,
         capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
+        text=False,
     )
-    output = (process.stdout or "") + (process.stderr or "")
+    output = _decode_output(process.stdout) + _decode_output(process.stderr)
     return process.returncode, output
 
 
@@ -113,6 +128,17 @@ def _safe_build_folder_name(name: str) -> str:
     return "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in name).strip("_") or "project"
 
 
+def _build_script_command(script: str) -> list[str]:
+    if os.name == "nt":
+        shell_bin = shutil.which("pwsh") or shutil.which("powershell") or "powershell"
+        return [shell_bin, "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script]
+
+    if Path("/bin/bash").exists():
+        return ["/bin/bash", "-lc", script]
+
+    return ["/bin/sh", "-c", script]
+
+
 def build_project(project: dict, build_id: str) -> tuple[bool, str, str]:
     repo_dir = Path(project["repo_local_path"])
     if not repo_dir.exists():
@@ -122,7 +148,7 @@ def build_project(project: dict, build_id: str) -> tuple[bool, str, str]:
     if not script:
         return False, "", "Build script is empty."
 
-    command = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script]
+    command = _build_script_command(script)
     code_build, output = run_command(command, cwd=str(repo_dir))
 
     history_root = repo_dir / ".auto_build_history"
