@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>工程自动构建发布工具</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="bg-shape bg-shape-a"></div>
+  <div class="bg-shape bg-shape-b"></div>
+
+  <main class="container">
+    <header class="header header-row">
+      <div>
+        <h1>工程自动构建发布工具</h1>
+        <p>集中管理工程、同步代码与构建流程</p>
+      </div>
+      <div>
+        <button id="open-project-modal" class="btn btn-primary">新建工程</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>工程列表</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>工程名称</th>
+              <th>仓库地址</th>
+              <th>构建脚本</th>
+              <th>本地路径</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="project-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button id="modal-close" class="btn btn-ghost">关闭</button>
+      </div>
+      <div id="modal-content" class="modal-content"></div>
+      <div id="modal-actions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <div id="project-modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>新建工程</h3>
+        <button id="project-modal-close" class="btn btn-ghost">关闭</button>
+      </div>
+      <div class="modal-content">
+        <form id="project-form" class="form-grid">
+          <label>
+            工程名称
+            <input type="text" name="name" required />
+          </label>
+          <label>
+            远程仓库地址
+            <input type="text" name="repo_url" required placeholder="https://..." />
+          </label>
+          <label>
+            仓库用户名
+            <input type="text" name="git_username" required />
+          </label>
+          <label>
+            仓库密码/Token
+            <input type="password" name="git_token" required />
+          </label>
+          <label>
+            本地仓库存储地址
+            <input type="text" name="local_base_path" required placeholder="D:/repos" />
+          </label>
+          <label>
+            构建脚本（PowerShell）
+            <textarea name="build_script" rows="4" required placeholder="mvn clean package -DskipTests&#10;# 或 npm ci; npm run build"></textarea>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">创建并克隆</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
